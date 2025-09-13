@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta tags for responsive design and SEO -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional Resume Builder - Create and download your resume in PDF format">
+    <title>Resume Builder - Create Professional Resumes</title>
+    
+    <!-- External libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <!-- Local CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Main container with semantic HTML structure -->
+    <main class="container" role="main">
+        <!-- Header section -->
+        <header>
+            <h1 id="main-title">
+                <i class="fas fa-file-alt" aria-hidden="true"></i> 
+                Resume Builder
+            </h1>
+            <p class="subtitle">Create your professional resume in minutes</p>
+        </header>
+
+        <!-- Template selection section -->
+        <section class="template-section" aria-labelledby="template-heading">
+            <h2 id="template-heading">Choose Template</h2>
+            <div class="template-grid" role="radiogroup" aria-labelledby="template-heading">
+                <div class="template-option">
+                    <input type="radio" id="template-modern" name="template" value="modern" checked 
+                           aria-describedby="template-modern-desc">
+                    <label for="template-modern" class="template-card">
+                        <div class="template-preview modern-preview"></div>
+                        <span class="template-name">Modern</span>
+                        <span id="template-modern-desc" class="template-desc">Two-column layout with blue accents and modern design</span>
+                    </label>
+                </div>
+                
+                <div class="template-option">
+                    <input type="radio" id="template-classic" name="template" value="classic" 
+                           aria-describedby="template-classic-desc">
+                    <label for="template-classic" class="template-card">
+                        <div class="template-preview classic-preview"></div>
+                        <span class="template-name">Classic</span>
+                        <span id="template-classic-desc" class="template-desc">Traditional single-column design with professional styling</span>
+                    </label>
+                </div>
+                
+                <div class="template-option">
+                    <input type="radio" id="template-creative" name="template" value="creative" 
+                           aria-describedby="template-creative-desc">
+                    <label for="template-creative" class="template-card">
+                        <div class="template-preview creative-preview"></div>
+                        <span class="template-name">Creative</span>
+                        <span id="template-creative-desc" class="template-desc">Colorful design with unique layout and visual appeal</span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Error and success messages -->
+        <div id="message-container" role="alert" aria-live="polite" class="hidden"></div>
+
+        <!-- Resume form -->
+        <form id="resumeForm" novalidate aria-labelledby="main-title">
+            <!-- Personal Information Section -->
+            <fieldset>
+                <legend>Personal Information</legend>
+                
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="include-photo" checked aria-describedby="photo-section-help">
+                        <span class="checkmark"></span>
+                        <i class="fas fa-camera form-icons" aria-hidden="true"></i>
+                        Include Profile Photo
+                    </label>
+                    <div id="photo-section-help" class="help-text">
+                        Uncheck to exclude photo from your resume
+                    </div>
+                </div>
+                
+                <div class="form-group" id="photo-group">
+                    <label for="photo">
+                        <i class="fas fa-camera form-icons" aria-hidden="true"></i>
+                        Profile Photo
+                    </label>
+                    <input type="file" id="photo" accept="image/*" aria-describedby="photo-help photo-error">
+                    <div id="photo-help" class="help-text">
+                        Recommended: Square image, max 5MB, JPG/PNG format
+                    </div>
+                    <div id="photo-error" class="error-message" role="alert"></div>
+                    <img id="photo-preview" alt="Profile photo preview" class="photo-preview">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">
+                        <i class="fas fa-user form-icons" aria-hidden="true"></i>
+                        Full Name <span class="required">*</span>
+                    </label>
+                    <input type="text" id="name" required 
+                           aria-describedby="name-help name-error" autocomplete="name">
+                    <div id="name-help" class="help-text">Enter your full name as you want it to appear on your resume</div>
+                    <div id="name-error" class="error-message" role="alert"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">
+                        <i class="fas fa-map-marker-alt form-icons" aria-hidden="true"></i>
+                        Address <span class="required">*</span>
+                    </label>
+                    <textarea id="address" rows="2" required 
+                              aria-describedby="address-help address-error" autocomplete="street-address"></textarea>
+                    <div id="address-help" class="help-text">Include city, state, and country</div>
+                    <div id="address-error" class="error-message" role="alert"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">
+                        <i class="fas fa-phone form-icons" aria-hidden="true"></i>
+                        Phone <span class="required">*</span>
+                    </label>
+                    <input type="tel" id="phone" required pattern="[\+]?[\d\s\(\)\-]+" 
+                           aria-describedby="phone-help phone-error" autocomplete="tel">
+                    <div id="phone-help" class="help-text">Include country code for international numbers</div>
+                    <div id="phone-error" class="error-message" role="alert"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope form-icons" aria-hidden="true"></i>
+                        Email <span class="required">*</span>
+                    </label>
+                    <input type="email" id="email" required 
+                           aria-describedby="email-help email-error" autocomplete="email">
+                    <div id="email-help" class="help-text">Use a professional email address</div>
+                    <div id="email-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="about">
+                        <i class="fas fa-user-circle form-icons" aria-hidden="true"></i>
+                        About / Professional Summary
+                    </label>
+                    <textarea id="about" rows="4" 
+                              placeholder="Write a brief professional summary, career objective, or personal statement..."
+                              aria-describedby="about-help about-error"></textarea>
+                    <div id="about-help" class="help-text">
+                        2-3 sentences highlighting your key qualifications, career goals, or unique value proposition
+                    </div>
+                    <div id="about-error" class="error-message" role="alert"></div>
+                </div>
+            </fieldset>
+
+            <!-- Professional Information Section -->
+            <fieldset>
+                <legend>Professional Information</legend>
+                
+                <div class="form-group" id="experience-group">
+                    <label for="experience">
+                        <i class="fas fa-briefcase form-icons" aria-hidden="true"></i>
+                        Professional Experience
+                    </label>
+                    <textarea id="experience" rows="4" required 
+                              aria-describedby="experience-help experience-error"></textarea>
+                    <div id="experience-help" class="help-text">
+                        Describe your work experience, achievements, and responsibilities
+                    </div>
+                    <div id="experience-error" class="error-message" role="alert"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="education">
+                        <i class="fas fa-graduation-cap form-icons" aria-hidden="true"></i>
+                        Education
+                    </label>
+                    <textarea id="education" rows="4" required 
+                              aria-describedby="education-help education-error"></textarea>
+                    <div id="education-help" class="help-text">
+                        Include degrees, certifications, and relevant coursework
+                    </div>
+                    <div id="education-error" class="error-message" role="alert"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="skills">
+                        <i class="fas fa-tools form-icons" aria-hidden="true"></i>
+                        Skills
+                    </label>
+                    <textarea id="skills" rows="3" required 
+                              aria-describedby="skills-help skills-error" 
+                              placeholder="JavaScript, Python, Project Management, etc."></textarea>
+                    <div id="skills-help" class="help-text">
+                        List your technical and soft skills separated by commas
+                    </div>
+                    <div id="skills-error" class="error-message" role="alert"></div>
+                </div>
+            </fieldset>
+
+            <!-- Projects Section -->
+            <fieldset>
+                <legend>Projects & Certificates</legend>
+                
+                <div class="form-group" id="projects-group">
+                    <label for="projects">
+                        <i class="fas fa-code form-icons" aria-hidden="true"></i>
+                        Projects
+                    </label>
+                    <textarea id="projects" rows="4" 
+                              aria-describedby="projects-help projects-error"></textarea>
+                    <div id="projects-help" class="help-text">
+                        Describe your notable projects, technologies used, and outcomes
+                    </div>
+                    <div id="projects-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group" id="certificates-group">
+                    <label for="certificates">
+                        <i class="fas fa-certificate form-icons" aria-hidden="true"></i>
+                        Certificates
+                    </label>
+                    <textarea id="certificates" rows="4" 
+                              aria-describedby="certificates-help certificates-error"></textarea>
+                    <div id="certificates-help" class="help-text">
+                        List your certifications, issuing organizations, and dates
+                    </div>
+                    <div id="certificates-error" class="error-message" role="alert"></div>
+                </div>
+            </fieldset>
+
+            <!-- Additional Information Section -->
+            <fieldset>
+                <legend>Additional Information</legend>
+                
+                <div class="form-group">
+                    <label for="strengths">
+                        <i class="fas fa-thumbs-up form-icons" aria-hidden="true"></i>
+                        Strengths
+                    </label>
+                    <textarea id="strengths" rows="3" required 
+                              aria-describedby="strengths-help strengths-error"></textarea>
+                    <div id="strengths-help" class="help-text">
+                        Highlight your key strengths and what makes you unique
+                    </div>
+                    <div id="strengths-error" class="error-message" role="alert"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="achievements">
+                        <i class="fas fa-trophy form-icons" aria-hidden="true"></i>
+                        Achievements
+                    </label>
+                    <textarea id="achievements" rows="3" required 
+                              aria-describedby="achievements-help achievements-error"></textarea>
+                    <div id="achievements-help" class="help-text">
+                        List your notable accomplishments, awards, and recognitions
+                    </div>
+                    <div id="achievements-error" class="error-message" role="alert"></div>
+                </div>
+            </fieldset>
+
+            <!-- Custom Section -->
+            <fieldset>
+                <legend>Custom Section</legend>
+                
+                <div class="form-group" id="custom-title-group">
+                    <label for="custom-title">
+                        <i class="fas fa-heading form-icons" aria-hidden="true"></i>
+                        Section Title
+                    </label>
+                    <input type="text" id="custom-title" 
+                           aria-describedby="custom-title-help custom-title-error"
+                           placeholder="e.g., Languages, Hobbies, Volunteer Work">
+                    <div id="custom-title-help" class="help-text">
+                        Enter the title for your custom section
+                    </div>
+                    <div id="custom-title-error" class="error-message" role="alert"></div>
+                </div>
+                
+                <div class="form-group" id="custom-content-group">
+                    <label for="custom-content">
+                        <i class="fas fa-edit form-icons" aria-hidden="true"></i>
+                        Section Content
+                    </label>
+                    <textarea id="custom-content" rows="4" 
+                              aria-describedby="custom-content-help custom-content-error"></textarea>
+                    <div id="custom-content-help" class="help-text">
+                        Enter the content for your custom section
+                    </div>
+                    <div id="custom-content-error" class="error-message" role="alert"></div>
+                </div>
+            </fieldset>
+
+            <!-- Form actions -->
+            <div class="form-actions">
+                <button type="button" id="save-progress" class="secondary-btn" 
+                        aria-describedby="save-help">
+                    <i class="fas fa-save" aria-hidden="true"></i> Save Progress
+                </button>
+                <div id="save-help" class="help-text">Your data is saved locally in your browser</div>
+                
+                <button type="submit" class="primary-btn" aria-describedby="generate-help">
+                    <i class="fas fa-download" aria-hidden="true"></i> Generate PDF
+                </button>
+                <div id="generate-help" class="help-text">Download your resume as a PDF file</div>
+            </div>
+        </form>
+    </main>
+
+    <!-- PDF Templates - Hidden until generation -->
+    <!-- Modern Template -->
+    <div id="pdf-modern" class="pdf-template modern-template" aria-hidden="true">
+        <div class="template-left-column">
+            <div class="photo-container">
+                <img id="pdf-photo-modern" class="pdf-photo" alt="Profile photo">
+            </div>
+            <div class="contact-section">
+                <h2 class="template-section-header">Contact</h2>
+                <div class="contact-info">
+                    <p id="pdf-address-modern"></p>
+                    <p id="pdf-phone-modern"></p>
+                    <p id="pdf-email-modern"></p>
+                </div>
+            </div>
+            <div class="strengths-section" id="strengths-section-modern">
+                <h2 class="template-section-header">Strengths</h2>
+                <div id="pdf-strengths-modern" class="content-block"></div>
+            </div>
+            <div class="skills-section-sidebar" id="skills-section-modern">
+                <h2 class="template-section-header">Skills</h2>
+                <ul id="pdf-skills-modern" class="skills-list"></ul>
+            </div>
+        </div>
+
+        <div class="template-right-column">
+            <h1 id="pdf-name-modern" class="template-name"></h1>
+            
+            <section class="about-section" id="about-section-modern" style="display: none;">
+                <h2 class="template-section-header">About</h2>
+                <div id="pdf-about-modern" class="content-block"></div>
+            </section>
+            
+            <section class="experience-section" id="experience-section-modern">
+                <h2 class="template-section-header">Professional Experience</h2>
+                <div id="pdf-experience-modern" class="content-block"></div>
+            </section>
+
+            <section class="education-section" id="education-section-modern">
+                <h2 class="template-section-header">Education</h2>
+                <div id="pdf-education-modern" class="content-block"></div>
+            </section>
+
+            <section class="projects-section" id="projects-section-modern" style="display: none;">
+                <h2 class="template-section-header">Projects</h2>
+                <div id="pdf-projects-modern" class="content-block"></div>
+            </section>
+
+            <section class="certificates-section" id="certificates-section-modern" style="display: none;">
+                <h2 class="template-section-header">Certificates</h2>
+                <div id="pdf-certificates-modern" class="content-block"></div>
+            </section>
+
+            <section class="achievements-section" id="achievements-section-modern">
+                <h2 class="template-section-header">Achievements</h2>
+                <div id="pdf-achievements-modern" class="content-block"></div>
+            </section>
+
+            <section class="custom-section" id="custom-section-modern" style="display: none;">
+                <h2 class="template-section-header" id="pdf-custom-title-modern"></h2>
+                <div id="pdf-custom-content-modern" class="content-block"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Classic Template -->
+    <div id="pdf-classic" class="pdf-template classic-template" aria-hidden="true">
+        <header class="classic-header" id="classic-header">
+            <img id="pdf-photo-classic" class="pdf-photo-classic" alt="Profile photo">
+            <div class="classic-header-content">
+                <h1 id="pdf-name-classic" class="classic-name"></h1>
+                <div class="classic-contact">
+                    <span id="pdf-address-classic"></span> | 
+                    <span id="pdf-phone-classic"></span> | 
+                    <span id="pdf-email-classic"></span>
+                </div>
+            </div>
+        </header>
+
+        <div class="classic-content">
+            <section class="classic-section" id="about-section-classic" style="display: none;">
+                <h2 class="classic-section-header">About</h2>
+                <div id="pdf-about-classic" class="classic-content-block"></div>
+            </section>
+            
+            <section class="classic-section" id="experience-section-classic">
+                <h2 class="classic-section-header">Professional Experience</h2>
+                <div id="pdf-experience-classic" class="classic-content-block"></div>
+            </section>
+
+            <section class="classic-section" id="education-section-classic">
+                <h2 class="classic-section-header">Education</h2>
+                <div id="pdf-education-classic" class="classic-content-block"></div>
+            </section>
+
+            <section class="classic-section" id="skills-section-classic">
+                <h2 class="classic-section-header">Skills</h2>
+                <ul id="pdf-skills-classic" class="classic-skills-list"></ul>
+            </section>
+
+            <section class="classic-section" id="projects-section-classic" style="display: none;">
+                <h2 class="classic-section-header">Projects</h2>
+                <div id="pdf-projects-classic" class="classic-content-block"></div>
+            </section>
+
+            <section class="classic-section" id="certificates-section-classic" style="display: none;">
+                <h2 class="classic-section-header">Certificates</h2>
+                <div id="pdf-certificates-classic" class="classic-content-block"></div>
+            </section>
+
+            <div class="classic-two-column">
+                <div class="classic-left">
+                    <section class="classic-section" id="strengths-section-classic">
+                        <h2 class="classic-section-header">Strengths</h2>
+                        <div id="pdf-strengths-classic" class="classic-content-block"></div>
+                    </section>
+                </div>
+                <div class="classic-right">
+                    <section class="classic-section" id="achievements-section-classic">
+                        <h2 class="classic-section-header">Achievements</h2>
+                        <div id="pdf-achievements-classic" class="classic-content-block"></div>
+                    </section>
+                </div>
+            </div>
+
+            <section class="classic-section" id="custom-section-classic" style="display: none;">
+                <h2 class="classic-section-header" id="pdf-custom-title-classic"></h2>
+                <div id="pdf-custom-content-classic" class="classic-content-block"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Creative Template -->
+    <div id="pdf-creative" class="pdf-template creative-template" aria-hidden="true">
+        <div class="creative-sidebar">
+            <div class="creative-photo-section">
+                <img id="pdf-photo-creative" class="pdf-photo-creative" alt="Profile photo">
+                <h1 id="pdf-name-creative" class="creative-name"></h1>
+            </div>
+            
+            <section class="creative-about" id="about-section-creative" style="display: none;">
+                <h2 class="creative-section-header">About</h2>
+                <div id="pdf-about-creative" class="creative-content-block"></div>
+            </section>
+            
+            <section class="creative-contact">
+                <h2 class="creative-section-header">Contact</h2>
+                <div class="creative-contact-info">
+                    <p id="pdf-address-creative"></p>
+                    <p id="pdf-phone-creative"></p>
+                    <p id="pdf-email-creative"></p>
+                </div>
+            </section>
+
+            <section class="creative-skills" id="skills-section-creative">
+                <h2 class="creative-section-header">Skills</h2>
+                <ul id="pdf-skills-creative" class="creative-skills-list"></ul>
+            </section>
+
+            <section class="creative-strengths" id="strengths-section-creative">
+                <h2 class="creative-section-header">Strengths</h2>
+                <div id="pdf-strengths-creative" class="creative-content-block"></div>
+            </section>
+        </div>
+
+        <div class="creative-main">
+            <section class="creative-section" id="experience-section-creative">
+                <h2 class="creative-section-header">Professional Experience</h2>
+                <div id="pdf-experience-creative" class="creative-content-block"></div>
+            </section>
+
+            <section class="creative-section" id="education-section-creative">
+                <h2 class="creative-section-header">Education</h2>
+                <div id="pdf-education-creative" class="creative-content-block"></div>
+            </section>
+
+            <section class="creative-section" id="projects-section-creative" style="display: none;">
+                <h2 class="creative-section-header">Projects</h2>
+                <div id="pdf-projects-creative" class="creative-content-block"></div>
+            </section>
+
+            <section class="creative-section" id="certificates-section-creative" style="display: none;">
+                <h2 class="creative-section-header">Certificates</h2>
+                <div id="pdf-certificates-creative" class="creative-content-block"></div>
+            </section>
+
+            <section class="creative-section" id="achievements-section-creative">
+                <h2 class="creative-section-header">Achievements</h2>
+                <div id="pdf-achievements-creative" class="creative-content-block"></div>
+            </section>
+
+            <section class="creative-section" id="custom-section-creative" style="display: none;">
+                <h2 class="creative-section-header" id="pdf-custom-title-creative"></h2>
+                <div id="pdf-custom-content-creative" class="creative-content-block"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading-indicator" class="loading hidden" aria-hidden="true">
+        <div class="loading-spinner"></div>
+        <p>Generating your resume...</p>
+    </div>
+
+    <!-- Local JavaScript file -->
+    <script src="script.js"></script>
+</body>
+
+</html>
