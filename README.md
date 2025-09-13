@@ -4,6 +4,11 @@ A simple and user-friendly web application that allows users to create, customiz
 
 ---
 
+## 🌐 Live Demo
+
+
+---
+
 ## 🚀 Features
 - Easy-to-use interface for building resumes
 - Add personal details, education, skills, projects, and work experience
@@ -29,15 +34,17 @@ cd resume-builder
 ```
 
 ---
-
+## Project Structure 
+```
 resume-builder/
 │── index.html
 │── style.css
 │── script.js
 │── README.md
+```
 
 ---
 
-
+## 👨‍💻 Built with ❤️ by [Harsh]
 
 
