@@ -4,8 +4,8 @@ A simple and user-friendly web application that allows users to create, customiz
 
 ---
 
-## 🌐 Live Demoat https://harshsinha003.github.io/Resume-Builder/
-
+## 🌐 Live Demo
+[Click Here](https://harshsinha003.github.io/Resume-Builder/)
 
 ---
 
